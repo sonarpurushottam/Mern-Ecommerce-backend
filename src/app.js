@@ -1,4 +1,6 @@
 import express from "express";
+import cors from "cors";
+
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -8,7 +10,15 @@ connectDB();
 
 const app = express();
 
-app.use(express.json());
+// Middleware
+app.use(express.json()); // Parse incoming JSON requests
+app.use(
+  cors({
+    origin: true, // Allows all origins, can be restricted to specific domains if needed
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 app.use("/api/users", userRoutes);
 
