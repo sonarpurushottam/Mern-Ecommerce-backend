@@ -168,7 +168,7 @@ const authUser = async (req, res) => {
 
     if (user && (await user.matchPassword(password))) {
       res.status(201).json({
-        message: "User login successfully!",
+        message: " login successfully!",
         _id: user._id,
         username: user.username,
         email: user.email,
