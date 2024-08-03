@@ -246,6 +246,10 @@ const getUserById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const logoutUser = async (req, res) => {
+  // Assuming we don't need to do much server-side for JWT
+  res.json({ message: "User logged out successfully" });
+};
 export {
   registerUser,
   authUser,
@@ -254,4 +258,5 @@ export {
   deleteUser,
   getUsers,
   getUserById,
+  logoutUser,
 };

@@ -1,75 +1,105 @@
-// backend/controllers/addressController.js
-import Address from "../models/AddressModel.js";
+import Address from '../models/addressModel.js';
 
-export const getAddresses = async (req, res) => {
+// Create a new address
+const createAddress = async (req, res) => {
+  const { street, city, state, postalCode, country, isDefault } = req.body;
+
   try {
-    const addresses = await Address.find({ userId: req.user.id });
+    const address = new Address({
+      user: req.user._id,
+      street,
+      city,
+      state,
+      postalCode,
+      country,
+      isDefault,
+    });
+
+    if (isDefault) {
+      await Address.updateMany(
+        { user: req.user._id },
+        { isDefault: false }
+      );
+    }
+
+    const createdAddress = await address.save();
+    res.status(201).json(createdAddress);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get all addresses for a user
+const getUserAddresses = async (req, res) => {
+  try {
+    const addresses = await Address.find({ user: req.user._id });
     res.json(addresses);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const getAddressById = async (req, res) => {
+// Get a single address by ID
+const getAddressById = async (req, res) => {
   try {
     const address = await Address.findById(req.params.id);
-    if (!address) return res.status(404).json({ message: "Address not found" });
-    res.json(address);
+
+    if (address && address.user.equals(req.user._id)) {
+      res.json(address);
+    } else {
+      res.status(404).json({ message: 'Address not found' });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const createAddress = async (req, res) => {
-  const { street, city, state, zipCode, country } = req.body;
-
-  try {
-    const address = new Address({
-      userId: req.user.id,
-      street,
-      city,
-      state,
-      zipCode,
-      country,
-    });
-
-    await address.save();
-    res.status(201).json(address);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const updateAddress = async (req, res) => {
-  const { street, city, state, zipCode, country } = req.body;
+// Update an address
+const updateAddress = async (req, res) => {
+  const { street, city, state, postalCode, country, isDefault } = req.body;
 
   try {
     const address = await Address.findById(req.params.id);
 
-    if (!address) return res.status(404).json({ message: "Address not found" });
+    if (address && address.user.equals(req.user._id)) {
+      address.street = street || address.street;
+      address.city = city || address.city;
+      address.state = state || address.state;
+      address.postalCode = postalCode || address.postalCode;
+      address.country = country || address.country;
+      address.isDefault = isDefault;
 
-    address.street = street || address.street;
-    address.city = city || address.city;
-    address.state = state || address.state;
-    address.zipCode = zipCode || address.zipCode;
-    address.country = country || address.country;
+      if (isDefault) {
+        await Address.updateMany(
+          { user: req.user._id },
+          { isDefault: false }
+        );
+      }
 
-    await address.save();
-    res.json(address);
+      const updatedAddress = await address.save();
+      res.json(updatedAddress);
+    } else {
+      res.status(404).json({ message: 'Address not found' });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const deleteAddress = async (req, res) => {
+// Delete an address
+const deleteAddress = async (req, res) => {
   try {
     const address = await Address.findById(req.params.id);
 
-    if (!address) return res.status(404).json({ message: "Address not found" });
-
-    await address.remove();
-    res.json({ message: "Address deleted" });
+    if (address && address.user.equals(req.user._id)) {
+      await address.remove();
+      res.json({ message: 'Address removed' });
+    } else {
+      res.status(404).json({ message: 'Address not found' });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+export { createAddress, getUserAddresses, getAddressById, updateAddress, deleteAddress };

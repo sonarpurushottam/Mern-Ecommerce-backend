@@ -1,14 +1,22 @@
-// backend/routes/addressRoutes.js
 import express from 'express';
-import { getAddresses, getAddressById, createAddress, updateAddress, deleteAddress } from '../controllers/addressController.js';
+import {
+  createAddress,
+  getUserAddresses,
+  getAddressById,
+  updateAddress,
+  deleteAddress,
+} from '../controllers/addressController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
-const addressRouter = express.Router();
+const router = express.Router();
 
-addressRouter.get('/', protect, getAddresses);
-addressRouter.post('/', protect, createAddress);
-addressRouter.get('/:id', protect, getAddressById);
-addressRouter.put('/:id', protect, updateAddress);
-addressRouter.delete('/:id', protect, deleteAddress);
+router.route('/')
+  .post(protect, createAddress)
+  .get(protect, getUserAddresses);
 
-export default addressRouter;
+router.route('/:id')
+  .get(protect, getAddressById)
+  .put(protect, updateAddress)
+  .delete(protect, deleteAddress);
+
+export default router;
