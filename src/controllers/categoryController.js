@@ -106,11 +106,16 @@ const removeCategory = asyncHandler(async (req, res) => {
   }
 });
 
+
 // List all categories
-const listCategory = asyncHandler(async (req, res) => {
-  const categories = await Category.find({});
-  res.json(categories);
-});
+const listCategories = async (req, res) => {
+  try {
+    const categories = await Category.find({});
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // Read a single category
 const readCategory = asyncHandler(async (req, res) => {
@@ -127,6 +132,6 @@ export {
   createCategory,
   updateCategory,
   removeCategory,
-  listCategory,
+  listCategories,
   readCategory,
 };

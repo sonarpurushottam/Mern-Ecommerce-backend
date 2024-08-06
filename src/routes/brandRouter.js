@@ -4,11 +4,13 @@ import {
   createBrand,
   updateBrand,
   removeBrand,
-  listBrand,
+  listBrands, // Changed from listBrand
+  listBrandsByCategory, // New function
   readBrand,
 } from "../controllers/brandController.js";
 import { protect, admin, superAdmin } from "../middleware/authMiddleware.js";
-import imageUpload from "../config/multerConfig.js"; // Adjust the path if necessary
+import imageUpload from "../config/multerConfig.js";
+import { getBrandsByCategory } from '../controllers/brandController.js';
 
 // Routes for brand management with image upload middleware
 router.post(
@@ -27,7 +29,9 @@ router.put(
 );
 router.delete("/:brandId", protect, admin, removeBrand);
 
-router.get("/get", listBrand);
+router.get("/get", listBrands); // Changed route
+router.get("/category/:categoryId", listBrandsByCategory); // New route
 router.get("/:id", readBrand);
+router.get('/getByCategory/:categoryId', getBrandsByCategory);
 
 export default router;

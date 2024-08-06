@@ -4,11 +4,11 @@ import {
   createCategory,
   updateCategory,
   removeCategory,
-  listCategory,
+  listCategories, // Changed from listCategory
   readCategory,
 } from "../controllers/categoryController.js";
 import { protect, admin, superAdmin } from "../middleware/authMiddleware.js";
-import imageUpload from "../config/multerConfig.js"; // Adjust the path if necessary
+import imageUpload from "../config/multerConfig.js";
 
 // Routes for category management with image upload middleware
 router.post(
@@ -27,7 +27,7 @@ router.put(
 );
 router.delete("/:categoryId", protect, admin, removeCategory);
 
-router.get("/get", listCategory);
+router.get("/get", listCategories); // Changed route
 router.get("/:id", readCategory);
 
 export default router;

@@ -1,6 +1,4 @@
-
 import mongoose from "mongoose";
-
 
 const brandSchema = new mongoose.Schema({
   name: {
@@ -10,7 +8,7 @@ const brandSchema = new mongoose.Schema({
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
-    
+    required: true,
   },
   image: {
     type: String,

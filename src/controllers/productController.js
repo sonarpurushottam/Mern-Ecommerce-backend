@@ -73,21 +73,7 @@ export const uploadProductHandler = async (req, res) => {
   }
 };
 
-export const getAllProductsHandler = async (req, res) => {
-  try {
-    const allProducts = await getAllProducts();
-    res.json({
-      message: "All Products",
-      success: true,
-      data: allProducts,
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: error.message || error,
-      success: false,
-    });
-  }
-};
+
 
 export const getProductByIdHandler = async (req, res) => {
   const id = req.params.id;
@@ -140,6 +126,26 @@ export const deleteProductByIdHandler = async (req, res) => {
     const product = await deleteProductById(id);
     if (!product) return res.status(404).json({ message: "Product not found" });
     res.json({ message: "Product has been deleted", product });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// Get all products
+export const getAllProductsHandler = async (req, res) => {
+  try {
+    const products = await Product.find({});
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get products by brand
+export const getProductsByBrand = async (req, res) => {
+  const { brandId } = req.params;
+  try {
+    const products = await Product.find({ brand: brandId });
+    res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

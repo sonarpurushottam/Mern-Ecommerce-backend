@@ -5,6 +5,7 @@ import {
   getProductByIdHandler,
   updateProductByIdHandler,
   deleteProductByIdHandler,
+  getProductsByBrand, // New function
 } from "../controllers/productController.js";
 import { protect, admin, superAdmin } from "../middleware/authMiddleware.js";
 import imageUpload from "../config/multerConfig2.js";
@@ -14,7 +15,7 @@ const router = express.Router();
 router.post(
   "/upload",
   protect,
-  admin, // Use admin middleware to restrict access to admins
+  admin,
   imageUpload.array("productImage"),
   uploadProductHandler
 );
@@ -26,16 +27,13 @@ router.get("/:id", getProductByIdHandler);
 router.put(
   "/:id",
   protect,
-  admin, // Use admin middleware to restrict access to admins
+  admin,
   imageUpload.array("newImages"),
   updateProductByIdHandler
 );
 
-router.delete(
-  "/:id",
-  protect,
-  admin, // Use admin middleware to restrict access to admins
-  deleteProductByIdHandler
-);
+router.delete("/:id", protect, admin, deleteProductByIdHandler);
+
+router.get("/brand/:brandId", getProductsByBrand); // New route
 
 export default router;

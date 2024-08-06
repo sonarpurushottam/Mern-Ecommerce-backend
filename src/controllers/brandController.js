@@ -4,7 +4,7 @@ import { handleUpload, handleDelete } from "../config/cloudinaryConfig.js";
 
 // Create a new brand
 const createBrand = asyncHandler(async (req, res) => {
-  const { name } = req.body;
+  const { name, category } = req.body;
   const file = req.file; // single file upload
 
   if (!name) {
@@ -26,6 +26,7 @@ const createBrand = asyncHandler(async (req, res) => {
 
     const brandData = {
       name,
+      category,
       image: imageUrl,
       imagePublicId: imagePublicId,
     };
@@ -110,10 +111,25 @@ const removeBrand = asyncHandler(async (req, res) => {
 });
 
 // List all brands
-const listBrand = asyncHandler(async (req, res) => {
-  const brands = await Brand.find({});
-  res.json(brands);
-});
+const listBrands = async (req, res) => {
+  try {
+    const brands = await Brand.find({}).populate("category");
+    res.json(brands);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// List brands by category
+const listBrandsByCategory = async (req, res) => {
+  const { categoryId } = req.params;
+  try {
+    const brands = await Brand.find({ category: categoryId });
+    res.json(brands);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // Read a single brand
 const readBrand = asyncHandler(async (req, res) => {
@@ -125,5 +141,22 @@ const readBrand = asyncHandler(async (req, res) => {
     throw new Error("Brand not found");
   }
 });
+export const getBrandsByCategory = async (req, res) => {
+  const { categoryId } = req.params;
+  
+  try {
+    const brands = await Brand.find({ category: categoryId });
+    res.json(brands);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
-export { createBrand, updateBrand, removeBrand, listBrand, readBrand };
+export {
+  createBrand,
+  updateBrand,
+  removeBrand,
+  listBrands,
+  listBrandsByCategory,
+  readBrand,
+};
