@@ -150,3 +150,13 @@ export const getProductsByBrand = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// Implement the getProductsByCategory function
+export const getProductsByCategory = async (req, res) => {
+  const { categoryId } = req.params;
+  try {
+    const products = await Product.find({ category: categoryId });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching products" });
+  }
+};

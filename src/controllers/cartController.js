@@ -43,25 +43,38 @@ export const addToCart = async (req, res) => {
 };
 
 export const updateCartItem = async (req, res) => {
-  const { productId, quantity } = req.body;
+  const { items } = req.body; // Expecting items array for multiple updates
+
+  if (!items || !Array.isArray(items)) {
+    return res.status(400).json({ message: "Invalid items array" });
+  }
 
   try {
     const cart = await Cart.findOne({ userId: req.user.id });
 
-    if (!cart) return res.status(404).json({ message: "Cart not found" });
-
-    const itemIndex = cart.items.findIndex(
-      (item) => item.productId == productId
-    );
-
-    if (itemIndex > -1) {
-      cart.items[itemIndex].quantity = quantity;
-      await cart.save();
-      res.json(cart);
-    } else {
-      res.status(404).json({ message: "Item not found in cart" });
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
     }
+
+    items.forEach((item) => {
+      const itemIndex = cart.items.findIndex((i) => i._id == item._id);
+
+      if (itemIndex > -1) {
+        if (item.quantity > 0) {
+          cart.items[itemIndex].quantity = item.quantity;
+        } else {
+          // Remove the item if quantity is 0 or less
+          cart.items.splice(itemIndex, 1);
+        }
+      } else {
+        return res.status(404).json({ message: `Item with id ${item._id} not found in cart` });
+      }
+    });
+
+    await cart.save();
+    res.json(cart);
   } catch (error) {
+    console.error("Error in updateCartItem:", error);
     res.status(500).json({ message: error.message });
   }
 };

@@ -5,7 +5,8 @@ import {
   getProductByIdHandler,
   updateProductByIdHandler,
   deleteProductByIdHandler,
-  getProductsByBrand, // New function
+  getProductsByBrand,
+  getProductsByCategory, // New function
 } from "../controllers/productController.js";
 import { protect, admin, superAdmin } from "../middleware/authMiddleware.js";
 import imageUpload from "../config/multerConfig2.js";
@@ -35,5 +36,6 @@ router.put(
 router.delete("/:id", protect, admin, deleteProductByIdHandler);
 
 router.get("/brand/:brandId", getProductsByBrand); // New route
+router.get("/category/:categoryId", getProductsByCategory);
 
 export default router;
