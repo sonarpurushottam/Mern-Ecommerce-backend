@@ -24,7 +24,7 @@ userRouter.put(
   updateUserProfile
 );
 userRouter.delete("/:id", protect, admin, deleteUser);
-userRouter.get("/", protect, superAdmin, getUsers);
+userRouter.get("/", protect, admin, getUsers);
 userRouter.get("/:id", protect, getUserById);
 userRouter.post("/logout", protect, logoutUser); // Add the logout route
 

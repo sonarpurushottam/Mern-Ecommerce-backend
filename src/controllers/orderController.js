@@ -1,4 +1,3 @@
-// backend/controllers/orderController.js
 import Order from "../models/OrderModel.js";
 
 export const getOrders = async (req, res) => {
@@ -8,6 +7,7 @@ export const getOrders = async (req, res) => {
       .populate("items.productId");
     res.json(orders);
   } catch (error) {
+    console.error("Error fetching orders:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -20,23 +20,38 @@ export const getOrderById = async (req, res) => {
     if (!order) return res.status(404).json({ message: "Order not found" });
     res.json(order);
   } catch (error) {
+    console.error("Error fetching order by ID:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
 
 export const createOrder = async (req, res) => {
-  const { items, totalAmount } = req.body;
-
   try {
-    const order = new Order({
-      userId: req.user.id,
-      items,
-      totalAmount,
-    });
+    const { userId, items, totalAmount } = req.body;
 
-    await order.save();
-    res.status(201).json(order);
+    console.log("Received order data:", { userId, items, totalAmount });
+
+    if (!userId || !items || items.length === 0 || totalAmount === undefined) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Validate each cart item
+    for (const item of items) {
+      if (!item.productId || !item.price || !item.quantity) {
+        return res.status(400).json({ message: "Invalid cart item data" });
+      }
+      if (item.quantity <= 0 || item.price <= 0) {
+        return res.status(400).json({ message: "Invalid quantity or price" });
+      }
+    }
+
+    const newOrder = new Order({ userId, items, totalAmount });
+    const savedOrder = await newOrder.save();
+
+    console.log("Saved order:", savedOrder);
+    res.status(201).json(savedOrder);
   } catch (error) {
+    console.error("Error creating order:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -54,6 +69,7 @@ export const updateOrderStatus = async (req, res) => {
 
     res.json(order);
   } catch (error) {
+    console.error("Error updating order status:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -67,6 +83,7 @@ export const deleteOrder = async (req, res) => {
     await order.remove();
     res.json({ message: "Order cancelled" });
   } catch (error) {
+    console.error("Error deleting order:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
