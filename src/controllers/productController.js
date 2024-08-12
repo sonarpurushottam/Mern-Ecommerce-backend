@@ -34,7 +34,7 @@ const deleteProductById = async (id) => {
 // Handler functions
 export const uploadProductHandler = async (req, res) => {
   const files = req.files.length > 0 ? req.files : [];
-  const { name, brand, category, description, price, quantity, countInStock } =
+  const { name, brand, category, description, price } =
     req.body;
 
   if (
@@ -43,8 +43,6 @@ export const uploadProductHandler = async (req, res) => {
     !category ||
     !description ||
     !price ||
-    !quantity ||
-    !countInStock ||
     files.length === 0
   ) {
     return res.status(400).json({ error: "All fields are required" });
@@ -59,8 +57,7 @@ export const uploadProductHandler = async (req, res) => {
       productImage: productImages,
       description,
       price,
-      quantity,
-      countInStock,
+      
     };
     const product = await uploadProduct(productData);
     res.json({
