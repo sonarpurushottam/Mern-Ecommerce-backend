@@ -1,17 +1,33 @@
 import Order from "../models/OrderModel.js";
+import User from '../models/userModel.js';
 
 export const getOrders = async (req, res) => {
   try {
     const orders = await Order.find()
-      .populate("userId")
-      .populate("items.productId");
+      .populate('userId', 'username') // Populate the user data with the name field
+      .exec();
     res.json(orders);
   } catch (error) {
-    console.error("Error fetching orders:", error.message);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error fetching orders' });
   }
 };
 
+// export const getOrdersByUserEmailOrName = async (req, res) => {
+//   const { emailOrName } = req.params;
+//   try {
+//     const orders = await Order.find()
+//       .populate({
+//         path: 'userId',
+//         match: { $or: [{ email: email }, { name: { $regex: username, $options: 'i' } }] },
+//         select: 'username'
+       
+//       })
+//       .exec();
+//     res.json(orders);
+//   } catch (error) {
+//     res.status(500).json({ message: 'Error fetching orders by user email or name' });
+//   }
+// };
 export const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
@@ -87,3 +103,4 @@ export const deleteOrder = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
