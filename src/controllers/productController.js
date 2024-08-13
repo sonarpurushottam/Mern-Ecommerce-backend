@@ -34,8 +34,7 @@ const deleteProductById = async (id) => {
 // Handler functions
 export const uploadProductHandler = async (req, res) => {
   const files = req.files.length > 0 ? req.files : [];
-  const { name, brand, category, description, price } =
-    req.body;
+  const { name, brand, category, description, price } = req.body;
 
   if (
     !name ||
@@ -57,7 +56,6 @@ export const uploadProductHandler = async (req, res) => {
       productImage: productImages,
       description,
       price,
-      
     };
     const product = await uploadProduct(productData);
     res.json({
@@ -69,8 +67,6 @@ export const uploadProductHandler = async (req, res) => {
     res.json({ message: error.message, success: false });
   }
 };
-
-
 
 export const getProductByIdHandler = async (req, res) => {
   const id = req.params.id;
@@ -86,27 +82,38 @@ export const getProductByIdHandler = async (req, res) => {
 export const updateProductByIdHandler = async (req, res) => {
   const id = req.params.id;
   try {
-    const product = await getProductById(id);
+    const product = await Product.findById(id);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
     // Handle new image uploads
-    const files = req.files ? req.files : [];
-    const newImages = files.map((file) => file.path);
+    let newImages = [];
+    if (req.files && req.files.length > 0) {
+      // Upload new images to Cloudinary
+      newImages = await Promise.all(
+        req.files.map(async (file) => {
+          const result = await cloudinary.uploader.upload(file.path);
+          return result.secure_url;
+        })
+      );
 
-    // Remove old images if new images are provided
-    if (newImages.length > 0) {
-      product.productImage.forEach(async (image) => {
+      // Delete old images from Cloudinary
+      for (const image of product.productImage) {
         const publicId = image.split("/").pop().split(".")[0];
         await cloudinary.uploader.destroy(publicId);
-      });
+      }
+    } else {
+      // Keep old images if no new images are provided
+      newImages = product.productImage;
     }
 
     const updatedData = {
       ...req.body,
-      productImage: newImages.length > 0 ? newImages : product.productImage,
+      productImage: newImages,
     };
 
-    const updatedProduct = await updateProductById(id, updatedData);
+    const updatedProduct = await Product.findByIdAndUpdate(id, updatedData, {
+      new: true,
+    });
     res.json({
       message: "Product has been updated",
       product: updatedProduct,
