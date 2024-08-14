@@ -1,5 +1,6 @@
 import Address from "../models/addressModel.js";
 
+
 // Create a new address
 const createAddress = async (req, res) => {
   const { street, city, state, postalCode, country, isDefault } = req.body;
