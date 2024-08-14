@@ -1,4 +1,4 @@
-import Address from '../models/addressModel.js';
+import Address from "../models/addressModel.js";
 
 // Create a new address
 const createAddress = async (req, res) => {
@@ -16,10 +16,7 @@ const createAddress = async (req, res) => {
     });
 
     if (isDefault) {
-      await Address.updateMany(
-        { user: req.user._id },
-        { isDefault: false }
-      );
+      await Address.updateMany({ user: req.user._id }, { isDefault: false });
     }
 
     const createdAddress = await address.save();
@@ -47,7 +44,7 @@ const getAddressById = async (req, res) => {
     if (address && address.user.equals(req.user._id)) {
       res.json(address);
     } else {
-      res.status(404).json({ message: 'Address not found' });
+      res.status(404).json({ message: "Address not found" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -70,16 +67,13 @@ const updateAddress = async (req, res) => {
       address.isDefault = isDefault;
 
       if (isDefault) {
-        await Address.updateMany(
-          { user: req.user._id },
-          { isDefault: false }
-        );
+        await Address.updateMany({ user: req.user._id }, { isDefault: false });
       }
 
       const updatedAddress = await address.save();
       res.json(updatedAddress);
     } else {
-      res.status(404).json({ message: 'Address not found' });
+      res.status(404).json({ message: "Address not found" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -93,13 +87,19 @@ const deleteAddress = async (req, res) => {
 
     if (address && address.user.equals(req.user._id)) {
       await address.remove();
-      res.json({ message: 'Address removed' });
+      res.json({ message: "Address removed" });
     } else {
-      res.status(404).json({ message: 'Address not found' });
+      res.status(404).json({ message: "Address not found" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export { createAddress, getUserAddresses, getAddressById, updateAddress, deleteAddress };
+export {
+  createAddress,
+  getUserAddresses,
+  getAddressById,
+  updateAddress,
+  deleteAddress,
+};
