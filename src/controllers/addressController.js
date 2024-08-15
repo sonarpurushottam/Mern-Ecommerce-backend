@@ -103,10 +103,3 @@ export {
   updateAddress,
   deleteAddress,
 };
-import fs from "fs";
-import path from "path";
-
-console.log(
-  "Checking if file exists:",
-  fs.existsSync(path.resolve("src/models/addressModel.js"))
-);
