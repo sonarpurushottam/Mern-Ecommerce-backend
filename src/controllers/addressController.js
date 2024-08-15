@@ -1,6 +1,5 @@
 import Address from "../models/addressModel.js";
 
-
 // Create a new address
 const createAddress = async (req, res) => {
   const { street, city, state, postalCode, country, isDefault } = req.body;
@@ -104,3 +103,10 @@ export {
   updateAddress,
   deleteAddress,
 };
+import fs from "fs";
+import path from "path";
+
+console.log(
+  "Checking if file exists:",
+  fs.existsSync(path.resolve("src/models/addressModel.js"))
+);
