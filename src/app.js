@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
-import path from 'path';
-
+import path from "path";
 
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
@@ -25,9 +24,12 @@ app.use(
 app.use("/api", indexRoutes);
 
 const PORT = process.env.PORT;
-console.log('Current working directory:', process.cwd());
-console.log('Resolved path for address model:', path.resolve('src/models/addressModel.js'));
 
+console.log("Current working directory:", process.cwd());
+console.log(
+  "Resolved path for address model:",
+  path.resolve("src/models/addressModel.js")
+);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
