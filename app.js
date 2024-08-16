@@ -6,7 +6,6 @@ import indexRoutes from "./src/routes/indexRouter.js";
 
 dotenv.config();
 connectDB();
-
 const app = express();
 
 // Middleware
