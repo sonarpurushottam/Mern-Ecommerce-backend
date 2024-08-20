@@ -67,7 +67,9 @@ export const updateCartItem = async (req, res) => {
           cart.items.splice(itemIndex, 1);
         }
       } else {
-        return res.status(404).json({ message: `Item with id ${item._id} not found in cart` });
+        return res
+          .status(404)
+          .json({ message: `Item with id ${item._id} not found in cart` });
       }
     });
 
@@ -91,6 +93,39 @@ export const removeFromCart = async (req, res) => {
 
     await cart.save();
     res.json(cart);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// Add this function to your cartController.js
+export const getCartItemCount = async (req, res) => {
+  try {
+    const cart = await Cart.findOne({ userId: req.user.id });
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+    const itemCount = cart.items.reduce(
+      (total, item) => total + item.quantity,
+      0
+    );
+    res.json({ itemCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const clearCart = async (req, res) => {
+  try {
+    const cart = await Cart.findOne({ userId: req.user.id });
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    cart.items = []; // Clear all items in the cart
+
+    await cart.save();
+    res.json({ message: "Cart cleared successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

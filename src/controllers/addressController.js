@@ -83,19 +83,19 @@ const updateAddress = async (req, res) => {
 // Delete an address
 const deleteAddress = async (req, res) => {
   try {
-    const address = await Address.findById(req.params.id);
+    // Find and remove the address
+    const address = await Address.findByIdAndDelete(req.params.id);
 
     if (address && address.user.equals(req.user._id)) {
-      await address.remove();
       res.json({ message: "Address removed" });
     } else {
-      res.status(404).json({ message: "Address not found" });
+      res.status(404).json({ message: "Address not found or unauthorized" });
     }
   } catch (error) {
+    console.error("Error deleting address:", error);
     res.status(500).json({ message: error.message });
   }
 };
-
 export {
   createAddress,
   getUserAddresses,

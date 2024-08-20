@@ -57,3 +57,17 @@ export const removeFromWishlist = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+export const getWishlistCount = async (req, res) => {
+  try {
+    const wishlist = await Wishlist.findOne({ userId: req.user.id });
+
+    if (wishlist) {
+      const count = wishlist.items.length;
+      res.json({ count });
+    } else {
+      res.json({ count: 0 });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
