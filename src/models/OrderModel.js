@@ -1,5 +1,43 @@
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 
+// const orderItemSchema = new mongoose.Schema({
+//   productId: {
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: 'Product',
+//     required: true
+//   },
+//   quantity: {
+//     type: Number,
+//     required: true,
+//     default: 1
+//   }
+// });
+
+// const orderSchema = new mongoose.Schema({
+//   userId: {
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: 'User',
+//     required: true
+//   },
+//   items: [orderItemSchema],
+//   totalAmount: {
+//     type: Number,
+//     required: true
+//   },
+//   status: {
+//     type: String,
+//     required: true,
+//     enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+//     default: 'Pending'
+//   },
+//   createdAt: {
+//     type: Date,
+//     default: Date.now
+//   }
+// });
+
+// export default mongoose.model('Order', orderSchema);
+import mongoose from 'mongoose';
 const orderItemSchema = new mongoose.Schema({
   productId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -12,7 +50,6 @@ const orderItemSchema = new mongoose.Schema({
     default: 1
   }
 });
-
 const orderSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -29,6 +66,11 @@ const orderSchema = new mongoose.Schema({
     required: true,
     enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
     default: 'Pending'
+  },
+  shippingAddress: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Address',
+    required: true
   },
   createdAt: {
     type: Date,
