@@ -6,7 +6,7 @@ import {
   updateProductByIdHandler,
   deleteProductByIdHandler,
   getProductsByBrand,
-  getProductsByCategory, // New function
+  getProductsByCategory, 
 } from "../controllers/productController.js";
 import { protect, admin, superAdmin } from "../middleware/authMiddleware.js";
 import imageUpload from "../config/multerConfig2.js";

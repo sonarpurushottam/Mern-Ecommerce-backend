@@ -7,7 +7,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "uploads",
-    public_id: (req, file) => `image-${Date.now()}`,
+    public_id: (req, file) => `image-${Date.now()}-${file.originalname}`, // Ensure uniqueness
   },
 });
 
