@@ -33,10 +33,10 @@ const createCategory = asyncHandler(async (req, res) => {
     const category = new Category(categoryData);
     const createdCategory = await category.save();
 
-    res.status(201).json(createdCategory);
+    res.status(201).json(createdCategory); // Respond with the created category
   } catch (error) {
     console.error("Error during category creation:", error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message }); // Respond with an error message if something goes wrong
   }
 });
 
@@ -56,6 +56,7 @@ const updateCategory = asyncHandler(async (req, res) => {
           await handleDelete(category.imagePublicId);
         } catch (error) {
           console.error("Error deleting old image:", error);
+          return res.status(500).json({ message: "Failed to delete old image" });
         }
       }
 
@@ -80,10 +81,10 @@ const updateCategory = asyncHandler(async (req, res) => {
 
     // Save the updated category
     const updatedCategory = await category.save();
-    res.json(updatedCategory);
+    res.json(updatedCategory); // Respond with the updated category
   } else {
     res.status(404);
-    throw new Error("Category not found");
+    throw new Error("Category not found"); // Respond if the category does not exist
   }
 });
 
@@ -95,25 +96,29 @@ const removeCategory = asyncHandler(async (req, res) => {
     // Delete the image from Cloudinary if it exists
     if (category.image) {
       const publicId = category.image.split("/").pop().split(".")[0]; // Extract public ID from the URL
-      await handleDelete(publicId);
+      try {
+        await handleDelete(publicId);
+      } catch (error) {
+        console.error("Error deleting image:", error);
+        return res.status(500).json({ message: "Failed to delete image" });
+      }
     }
 
     await Category.findByIdAndDelete(req.params.categoryId);
-    res.json({ message: "Category removed" });
+    res.json({ message: "Category removed" }); // Respond with a success message
   } else {
     res.status(404);
-    throw new Error("Category not found");
+    throw new Error("Category not found"); // Respond if the category does not exist
   }
 });
-
 
 // List all categories
 const listCategories = async (req, res) => {
   try {
     const categories = await Category.find({});
-    res.json(categories);
+    res.json(categories); // Respond with the list of categories
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message }); // Respond with an error message if something goes wrong
   }
 };
 
@@ -121,10 +126,10 @@ const listCategories = async (req, res) => {
 const readCategory = asyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id);
   if (category) {
-    res.json(category);
+    res.json(category); // Respond with the category details
   } else {
     res.status(404);
-    throw new Error("Category not found");
+    throw new Error("Category not found"); // Respond if the category does not exist
   }
 });
 

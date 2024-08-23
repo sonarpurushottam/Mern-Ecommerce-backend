@@ -1,12 +1,9 @@
-// productController.js
 import Product from "../models/productModel.js";
 import cloudinary from "../config/cloudinaryConfig2.js";
 
 // Service functions
 const uploadProduct = async (productData) => {
-  const existingProduct = await Product.findOne({
-    name: productData.name,
-  });
+  const existingProduct = await Product.findOne({ name: productData.name });
   if (existingProduct) {
     throw new Error("Product with the same name already exists");
   }
@@ -15,8 +12,7 @@ const uploadProduct = async (productData) => {
 };
 
 const getAllProducts = async () => {
-  const products = await Product.find().sort({ createdAt: -1 });
-  return products;
+  return await Product.find().sort({ createdAt: -1 });
 };
 
 const getProductById = async (_id) => {
@@ -31,7 +27,7 @@ const deleteProductById = async (id) => {
   return await Product.findByIdAndDelete(id);
 };
 
-
+// Handlers
 export const uploadProductHandler = async (req, res) => {
   const files = req.files.length > 0 ? req.files : [];
   const { name, brand, category, description, price } = req.body;
@@ -58,11 +54,7 @@ export const uploadProductHandler = async (req, res) => {
     };
     
     const product = await uploadProduct(productData);
-    res.json({
-      message: "Product uploaded successfully!",
-      product,
-      success: true,
-    });
+    res.json({ message: "Product uploaded successfully!", product, success: true });
   } catch (error) {
     res.status(500).json({ message: error.message, success: false });
   }
@@ -76,7 +68,6 @@ export const updateProductByIdHandler = async (req, res) => {
 
     let newImages = [];
     if (req.files && req.files.length > 0) {
-      // Upload new images to Cloudinary
       newImages = await Promise.all(
         req.files.map(async (file) => {
           const result = await cloudinary.uploader.upload(file.path);
@@ -84,7 +75,6 @@ export const updateProductByIdHandler = async (req, res) => {
         })
       );
 
-      // Delete old images from Cloudinary
       for (const image of product.productImage) {
         const publicId = image.split("/").pop().split(".")[0];
         await cloudinary.uploader.destroy(publicId);
@@ -99,19 +89,11 @@ export const updateProductByIdHandler = async (req, res) => {
     };
 
     const updatedProduct = await Product.findByIdAndUpdate(id, updatedData, { new: true });
-    res.json({
-      message: "Product has been updated",
-      product: updatedProduct,
-      success: true,
-    });
+    res.json({ message: "Product has been updated", product: updatedProduct, success: true });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
-
-
-
 
 export const getProductByIdHandler = async (req, res) => {
   const id = req.params.id;
@@ -124,51 +106,6 @@ export const getProductByIdHandler = async (req, res) => {
   }
 };
 
-// export const updateProductByIdHandler = async (req, res) => {
-//   const id = req.params.id;
-//   try {
-//     const product = await Product.findById(id);
-//     if (!product) return res.status(404).json({ message: "Product not found" });
-
-//     // Handle new image uploads
-//     let newImages = [];
-//     if (req.files && req.files.length > 0) {
-//       // Upload new images to Cloudinary
-//       newImages = await Promise.all(
-//         req.files.map(async (file) => {
-//           const result = await cloudinary.uploader.upload(file.path);
-//           return result.secure_url;
-//         })
-//       );
-
-//       // Delete old images from Cloudinary
-//       for (const image of product.productImage) {
-//         const publicId = image.split("/").pop().split(".")[0];
-//         await cloudinary.uploader.destroy(publicId);
-//       }
-//     } else {
-//       // Keep old images if no new images are provided
-//       newImages = product.productImage;
-//     }
-
-//     const updatedData = {
-//       ...req.body,
-//       productImage: newImages,
-//     };
-
-//     const updatedProduct = await Product.findByIdAndUpdate(id, updatedData, {
-//       new: true,
-//     });
-//     res.json({
-//       message: "Product has been updated",
-//       product: updatedProduct,
-//       success: true,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
 export const deleteProductByIdHandler = async (req, res) => {
   const id = req.params.id;
   try {
@@ -179,17 +116,16 @@ export const deleteProductByIdHandler = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-// Get all products
+
 export const getAllProductsHandler = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await getAllProducts();
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get products by brand
 export const getProductsByBrand = async (req, res) => {
   const { brandId } = req.params;
   try {
@@ -199,7 +135,7 @@ export const getProductsByBrand = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-// Implement the getProductsByCategory function
+
 export const getProductsByCategory = async (req, res) => {
   const { categoryId } = req.params;
   try {

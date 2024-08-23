@@ -6,10 +6,12 @@ import {
 import User from "../models/userModel.js";
 import generateToken from "../utils/generateToken.js";
 
+// Register a new user
 const registerUser = async (req, res) => {
   const { username, email, password, mobile } = req.body;
-  const file = req.file; // single file upload
+  const file = req.file; // Single file upload for profile picture
 
+  // Validate input fields
   if (!username || !email || !password || !mobile) {
     return res
       .status(400)
@@ -17,6 +19,7 @@ const registerUser = async (req, res) => {
   }
 
   try {
+    // Check if user with the same username, email, or mobile already exists
     const userExistsByUsername = await User.findOne({ username });
     if (userExistsByUsername) {
       return res.status(400).json({ message: "Username already exists" });
@@ -35,6 +38,7 @@ const registerUser = async (req, res) => {
     let profilePic = null;
     let profilePicPublicId = null;
 
+    // Handle profile picture upload if a file is provided
     if (file) {
       const b64 = Buffer.from(file.buffer).toString("base64");
       const dataURI = "data:" + file.mimetype + ";base64," + b64;
@@ -43,6 +47,7 @@ const registerUser = async (req, res) => {
       profilePicPublicId = cldRes.public_id;
     }
 
+    // Create user with the provided data
     const userData = {
       username,
       email,
@@ -64,7 +69,7 @@ const registerUser = async (req, res) => {
           mobile: user.mobile,
           role: user.role,
           profilePic: user.profilePic,
-          token: generateToken(user._id),
+          token: generateToken(user._id), // Generate JWT token for the user
         },
         success: true,
       });
@@ -76,8 +81,11 @@ const registerUser = async (req, res) => {
     res.status(500).json({ message: error.message, success: false });
   }
 };
+
+// Update user profile information
 const updateUserProfile = async (req, res) => {
   try {
+    // Find user by ID from the request (authenticated user)
     const user = await User.findById(req.user._id);
 
     if (user) {
@@ -110,10 +118,12 @@ const updateUserProfile = async (req, res) => {
         user.mobile = mobile;
       }
 
+      // Update password if provided
       if (req.body.password) {
         user.password = req.body.password;
       }
 
+      // Handle profile picture upload if a new file is provided
       if (req.file) {
         // Destroy the old profile pic if it exists
         if (user.profilePicPublicId) {
@@ -136,7 +146,7 @@ const updateUserProfile = async (req, res) => {
         user.profilePicPublicId = cldRes.public_id;
       }
 
-      // Save the updated user
+      // Save the updated user data
       const updatedUser = await user.save();
 
       res.json({
@@ -157,6 +167,7 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+// Authenticate a user and log them in
 const authUser = async (req, res) => {
   const { emailOrMobile, password } = req.body;
 
@@ -166,16 +177,17 @@ const authUser = async (req, res) => {
       ? await User.findOne({ email: emailOrMobile })
       : await User.findOne({ mobile: emailOrMobile });
 
+    // Check if the user exists and password matches
     if (user && (await user.matchPassword(password))) {
       res.status(201).json({
-        message: " login successfully!",
+        message: "Login successfully!",
         _id: user._id,
         username: user.username,
         email: user.email,
         mobile: user.mobile,
         role: user.role,
         profilePic: user.profilePic,
-        token: generateToken(user._id), // Generate token upon successful login
+        token: generateToken(user._id), // Generate JWT token for the user
       });
     } else {
       res
@@ -186,6 +198,8 @@ const authUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Get the profile of the authenticated user
 const getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -207,14 +221,17 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+// Delete a user by ID
 const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
 
     if (user) {
+      // Remove profile picture from Cloudinary if it exists
       if (user.profilePicPublicId) {
         await cloudinary.v2.uploader.destroy(user.profilePicPublicId);
       }
+      // Remove the user from the database
       await user.remove();
       res.json({ message: "User removed" });
     } else {
@@ -225,6 +242,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// Get a list of all users
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
@@ -234,6 +252,7 @@ const getUsers = async (req, res) => {
   }
 };
 
+// Get user details by ID (excluding password)
 const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
@@ -246,10 +265,12 @@ const getUserById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Handle user logout (typically handled client-side for JWT)
 const logoutUser = async (req, res) => {
-  // Assuming we don't need to do much server-side for JWT
   res.json({ message: "User logged out successfully" });
 };
+
 export {
   registerUser,
   authUser,

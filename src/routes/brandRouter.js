@@ -4,8 +4,8 @@ import {
   createBrand,
   updateBrand,
   removeBrand,
-  listBrands, // Changed from listBrand
-  listBrandsByCategory, // New function
+  listBrands,
+  listBrandsByCategory,
   readBrand,
 } from "../controllers/brandController.js";
 import { protect, admin, superAdmin } from "../middleware/authMiddleware.js";
@@ -29,8 +29,8 @@ router.put(
 );
 router.delete("/:brandId", protect, admin, removeBrand);
 
-router.get("/get", listBrands); // Changed route
-router.get("/category/:categoryId", listBrandsByCategory); // New route
+router.get("/get", listBrands); 
+router.get("/category/:categoryId", listBrandsByCategory); 
 router.get("/:id", readBrand);
 router.get('/getByCategory/:categoryId', getBrandsByCategory);
 

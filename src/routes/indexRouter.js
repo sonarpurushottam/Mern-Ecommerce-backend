@@ -7,8 +7,7 @@ import productRouter from "./productRouter.js";
 import cartRouter from "./cartRouter.js";
 import wishlistRouter from "./wishlistRouter.js";
 import orderRouter from "./orderRouter.js";
-import reviewRouter from "./reviewRouter.js";
-import shippingRouter from "./shippingRouter.js";
+
 import addressRoutes from "./addressRouter.js";
 
 const router = express.Router();
@@ -21,7 +20,7 @@ router.use("/cart", cartRouter);
 router.use("/wishlist", wishlistRouter);
 router.use("/orders", orderRouter);
 router.use("/addresses", addressRoutes);
-router.use("/review", reviewRouter);
-router.use("/shipping", shippingRouter);
+
+
 
 export default router;
