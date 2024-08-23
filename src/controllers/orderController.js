@@ -1,5 +1,4 @@
 import Order from "../models/OrderModel.js";
-import User from "../models/userModel.js";
 import Product from "../models/productModel.js";
 import Address from "../models/AddressModel.js";
 
@@ -20,7 +19,7 @@ export const getOrders = async (req, res) => {
       query.status = status; // Filter by order status if provided
     }
 
-    let orders = Order.find(query)
+    let ordersQuery = Order.find(query)
       .populate("userId", "username") // Populate user details
       .populate({
         path: "items.productId",
@@ -35,13 +34,14 @@ export const getOrders = async (req, res) => {
 
     // Sort orders if a sort parameter is provided
     if (sort) {
-      orders = orders.sort({ createdAt: sort === "desc" ? -1 : 1 });
+      ordersQuery = ordersQuery.sort({ createdAt: sort === "desc" ? -1 : 1 });
     }
 
-    orders = await orders.exec();
+    const orders = await ordersQuery.exec();
 
     res.json(orders); // Respond with the list of orders
   } catch (error) {
+    console.error("Error fetching orders:", error); // Log error details
     res.status(500).json({ message: "Error fetching orders" }); // Respond with an error message if something goes wrong
   }
 };
@@ -67,6 +67,7 @@ export const getOrderById = async (req, res) => {
 
     res.json(order); // Respond with the order details
   } catch (error) {
+    console.error("Error fetching order by ID:", error); // Log error details
     res.status(500).json({ message: error.message }); // Respond with an error message if something goes wrong
   }
 };
@@ -76,7 +77,13 @@ export const createOrder = async (req, res) => {
   try {
     const { userId, items, totalAmount, shippingAddress } = req.body;
 
-    if (!userId || !items || items.length === 0 || totalAmount === undefined || !shippingAddress) {
+    if (
+      !userId ||
+      !items ||
+      items.length === 0 ||
+      totalAmount === undefined ||
+      !shippingAddress
+    ) {
       return res.status(400).json({ message: "Missing required fields" }); // Respond if required fields are missing
     }
 
@@ -95,6 +102,7 @@ export const createOrder = async (req, res) => {
 
     res.status(201).json(savedOrder); // Respond with the created order
   } catch (error) {
+    console.error("Error creating order:", error); // Log error details
     res.status(500).json({ message: error.message }); // Respond with an error message if something goes wrong
   }
 };
@@ -113,6 +121,7 @@ export const updateOrderStatus = async (req, res) => {
 
     res.json(order); // Respond with the updated order
   } catch (error) {
+    console.error("Error updating order status:", error); // Log error details
     res.status(500).json({ message: error.message }); // Respond with an error message if something goes wrong
   }
 };
@@ -134,7 +143,7 @@ export const deleteOrder = async (req, res) => {
 
     res.status(400).json({ message: "Order cannot be deleted" }); // Respond if the order cannot be deleted
   } catch (error) {
-    console.error("Error deleting order:", error); // Log the error details
+    console.error("Error deleting order:", error); // Log error details
     res.status(500).json({ message: error.message }); // Respond with an error message if something goes wrong
   }
 };

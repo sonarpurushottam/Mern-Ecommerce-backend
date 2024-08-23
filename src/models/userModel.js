@@ -10,10 +10,10 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       default: "user",
-      enum: ["user", "admin", "superadmin"],
+      enum: ["user", "admin", "superadmin", "viewer"], // Added "viewer" role
     },
-    profilePic: { type: String }, // URL to profile picture, optional
-    profilePicPublicId: { type: String }, // Public ID for Cloudinary, optional
+    profilePic: { type: String },
+    profilePicPublicId: { type: String },
   },
   {
     timestamps: true,
