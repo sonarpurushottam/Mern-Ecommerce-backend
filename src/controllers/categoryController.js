@@ -113,14 +113,23 @@ const removeCategory = asyncHandler(async (req, res) => {
 });
 
 // List all categories
+// const listCategories = async (req, res) => {
+//   try {
+//     const categories = await Category.find({});
+//     res.json(categories); // Respond with the list of categories
+//   } catch (error) {
+//     res.status(500).json({ message: error.message }); // Respond with an error message if something goes wrong
+//   }
+// };
 const listCategories = async (req, res) => {
   try {
-    const categories = await Category.find({});
-    res.json(categories); // Respond with the list of categories
+    const categories = await Category.find({}).select("name image");
+    res.json(categories); 
   } catch (error) {
-    res.status(500).json({ message: error.message }); // Respond with an error message if something goes wrong
+    res.status(500).json({ message: error.message });
   }
 };
+
 
 // Read a single category
 const readCategory = asyncHandler(async (req, res) => {
