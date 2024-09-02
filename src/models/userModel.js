@@ -20,16 +20,22 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Pre-save middleware to hash the password
+// Pre-save middleware to hash the password if it's modified
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
-    next();
+    return next();
   }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
-// Method to match user entered password to hashed password
+// Method to match user-entered password to hashed password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
